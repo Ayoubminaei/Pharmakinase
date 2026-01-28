@@ -12,6 +12,7 @@ const flashcardRoutes = require('./routes/flashcards');
 const searchRoutes = require('./routes/search');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
