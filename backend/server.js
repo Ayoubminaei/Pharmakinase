@@ -16,6 +16,10 @@ app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
+contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-eval'"],
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
