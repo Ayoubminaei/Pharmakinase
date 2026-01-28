@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chapters  Chapter[]
+}
+
+model Chapter {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  order       Int    @default(0)
+  color       String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  topics    Topic[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Topic {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  order       Int    @default(0)
+
+  chapterId String
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  items     Item[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+}
+
+model Item {
+  id             String   @id @default(uuid())
+  name           String
+  scientificName String?
+  type           ItemType
+  description    String   @db.Text
+  imageUrl       String?
+
+  topicId String
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  properties Property[]
+  flashcard  Flashcard?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([topicId])
+  @@index([type])
+}
+
+model Property {
+  id    String @id @default(uuid())
+  key   String
+  value String
+
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+}
+
+model Flashcard {
+  id      String @id @default(uuid())
+  front   String @db.Text
+  back    String @db.Text
+  itemId  String @unique
+  item    Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ItemType {
+  molecule
+  enzyme
+  medication
+}
